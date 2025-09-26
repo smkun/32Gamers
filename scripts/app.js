@@ -13,105 +13,44 @@ class PortalManager {
 
     async loadApps() {
         try {
-            // Try multiple sources for maximum reliability
-            const sources = [
-                // 1. Try GitHub raw file (if configured)
-                this.getGitHubUrl(),
-                // 2. Try local JSON file
-                'apps.json',
-                // 3. Try with cachebuster
-                `apps.json?v=${Date.now()}`
-            ].filter(Boolean);
-
-            let data = null;
-            for (const url of sources) {
-                try {
-                    console.log(`Trying to load from: ${url}`);
-                    const response = await fetch(url);
-                    if (response.ok) {
-                        data = await response.json();
-                        console.log(`Successfully loaded from: ${url}`);
-                        break;
-                    }
-                } catch (e) {
-                    console.warn(`Failed to load from ${url}:`, e);
-                    continue;
-                }
+            // Wait for Firebase to be ready
+            if (!window.firebase || !window.firebase.db) {
+                console.log('Waiting for Firebase to initialize...');
+                await new Promise(resolve => setTimeout(resolve, 1000));
             }
 
-            if (data && data.apps) {
-                this.apps = data.apps;
-                // Update page title if provided
-                if (data.title) {
-                    const h1 = document.querySelector('h1');
-                    if (h1) h1.textContent = data.title;
-                }
+            if (window.firebase && window.firebase.db) {
+                console.log('Loading from Firebase...');
+                const querySnapshot = await window.firebase.getDocs(window.firebase.collection(window.firebase.db, 'apps'));
+                const firebaseApps = [];
+                querySnapshot.forEach((doc) => {
+                    const app = doc.data();
+                    firebaseApps.push({
+                        id: app.appId,
+                        name: app.name,
+                        url: app.url,
+                        image: app.image,
+                        description: app.description
+                    });
+                });
+
+                this.apps = firebaseApps;
+                console.log(`Successfully loaded ${firebaseApps.length} apps from Firebase`);
+                return;
             } else {
-                throw new Error('No valid data source found');
+                throw new Error('Firebase failed to initialize');
             }
         } catch (error) {
-            console.error('Failed to load apps from all sources:', error);
-            // Fallback to hardcoded apps if all sources fail
+            console.error('Failed to load apps from Firebase:', error);
             this.loadFallbackApps();
         }
     }
 
-    getGitHubUrl() {
-        // You can configure this for GitHub Pages or raw file access
-        // Example: 'https://raw.githubusercontent.com/yourusername/32gamers/main/apps.json'
-        const githubConfig = window.GITHUB_CONFIG || {};
-        if (githubConfig.repo) {
-            return `https://raw.githubusercontent.com/${githubConfig.repo}/main/apps.json`;
-        }
-        return null;
-    }
 
     loadFallbackApps() {
-        console.log('Loading fallback apps...');
-        this.apps = [
-            {
-                "id": "traveller",
-                "name": "Traveller App",
-                "url": "TravellerApp/index.html",
-                "image": "TravellerApp.png",
-                "description": "Character generator and game tools for Traveller RPG"
-            },
-            {
-                "id": "mmrpg",
-                "name": "MMRPG App",
-                "url": "MMRPGApp/index.html",
-                "image": "MMRPG.png",
-                "description": "Tools and utilities for MMRPG campaigns"
-            },
-            {
-                "id": "knight",
-                "name": "KnightRPG App",
-                "url": "KnightRPG/index.html",
-                "image": "knight_tarot.png",
-                "description": "Character tools for KnightRPG system"
-            },
-            {
-                "id": "baa",
-                "name": "BAA Campaign",
-                "url": "BAA/index.html",
-                "image": "BAA.png",
-                "description": "Boston Avenger RPG Campaign resources"
-            },
-            {
-                "id": "rogues",
-                "name": "The Rogues Gallery",
-                "url": "theRoguesGallery/index.html",
-                "image": "theRoguesGallery.png",
-                "description": "Character gallery and NPC resources"
-            },
-            {
-                "id": "converter",
-                "name": "5e to Daggerheart Converter",
-                "url": "5eConverter/index.html",
-                "image": "5eConvert.png",
-                "description": "Convert D&D 5e content to Daggerheart system"
-            }
-        ];
+        console.log('No apps available - Firebase and JSON sources failed');
+        this.apps = [];
+        this.showError('Unable to load apps. Please check your internet connection or contact the administrator.');
     }
 
     renderApps() {
@@ -140,7 +79,7 @@ class PortalManager {
         button.setAttribute('title', app.description);
 
         button.innerHTML = `
-            <img src="${app.image}" alt="${app.name}" onerror="this.src='placeholder.png'"/>
+            <img src="assets/images/${app.image}" alt="${app.name}" onerror="this.src='assets/images/placeholder.png'"/>
             <span>${app.name}</span>
         `;
 
@@ -187,6 +126,33 @@ class PortalManager {
 
         // Add search functionality (for future enhancement)
         this.setupSearch();
+
+        // Setup admin access
+        this.setupAdminAccess();
+    }
+
+    setupAdminAccess() {
+        const adminIcon = document.getElementById('adminIcon');
+        if (!adminIcon) return;
+
+        // Admin access with protection
+        adminIcon.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.handleAdminAccess();
+        });
+
+        // Secret key combination: Ctrl+Alt+A
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.altKey && e.key === 'a') {
+                e.preventDefault();
+                this.handleAdminAccess();
+            }
+        });
+    }
+
+    async handleAdminAccess() {
+        // Direct access to Firebase admin - no password needed
+        window.location.href = 'firebase-admin.html';
     }
 
     setupSearch() {

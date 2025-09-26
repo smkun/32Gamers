@@ -4,16 +4,38 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>32Gamers Portal</title>
-        <link rel="icon" type="image/png" href="32gamers_favicon.png" />
+        <link rel="icon" type="image/png" href="assets/favicons/32gamers_favicon.png" />
         <link rel="stylesheet" href="style.css" />
-        <script src="./app.js" defer></script>
+        <script type="module" src="scripts/firebase-config.js"></script>
+        <script src="scripts/app.js" defer></script>
+        <script>
+            // Direct admin access - Firebase handles all authentication
+            function handleAdminClick() {
+                window.location.href = 'firebase-admin.html';
+            }
+
+            // Secret key combination: Ctrl+Alt+A
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.altKey && e.key === 'a') {
+                    e.preventDefault();
+                    handleAdminClick();
+                }
+            });
+        </script>
     </head>
 
     <body>
         <div class="wrapper">
             <!-- Top Centered Logo -->
             <div class="logo-container">
-                <img src="32Gamers_logo.png" alt="32Gamers Logo" class="logo" />
+                <img src="assets/images/32Gamers_logo.png" alt="32Gamers Logo" class="logo" />
+                <!-- Admin Access Icon -->
+                <div class="admin-icon" id="adminIcon" title="Admin Access" onclick="handleAdminClick()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 1l3 6 6 3-6 3-3 6-3-6-6-3 6-3z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </div>
             </div>
 
             <div class="container">
