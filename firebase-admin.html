@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>32Gamers Firebase Admin</title>
     <link rel="icon" type="image/png" href="assets/favicons/32gamers_favicon.png" />
+    <link rel="stylesheet" href="style.css" />
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -178,9 +179,9 @@
 </head>
 <body>
     <div class="admin-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div class="admin-header">
             <h1>32Gamers Firebase Admin</h1>
-            <button onclick="window.location.href='index.html'" class="btn-secondary" style="padding: 8px 16px;">
+            <button onclick="window.location.href='index.html'" class="btn-secondary back-button">
                 ← Back to Portal
             </button>
         </div>
@@ -203,11 +204,11 @@
         <!-- User Info -->
         <div id="userSection" class="hidden">
             <div class="user-info">
-                <div style="display: flex; align-items: center;">
+                <div class="user-flex">
                     <img id="userAvatar" class="user-avatar" src="" alt="User">
                     <div>
-                        <div id="userName" style="font-weight: 600;"></div>
-                        <div id="userEmail" style="font-size: 14px; opacity: 0.8;"></div>
+                        <div id="userName" class="user-details"></div>
+                        <div id="userEmail" class="user-email"></div>
                     </div>
                 </div>
                 <button id="logoutBtn" class="btn-secondary">Sign Out</button>
@@ -239,7 +240,7 @@
                     <textarea id="appDescription" rows="3" placeholder="Brief description"></textarea>
                 </div>
                 <button class="btn-primary" onclick="addApp()" id="addButton">Add App</button>
-                <button class="btn-secondary" onclick="cancelEdit()" id="cancelButton" style="display: none;">Cancel Edit</button>
+                <button class="btn-secondary cancel-button" onclick="cancelEdit()" id="cancelButton">Cancel Edit</button>
 
                 <h3>Current Apps</h3>
                 <div class="app-list" id="appList">
@@ -380,14 +381,14 @@
             document.getElementById('appDescription').value = app.description;
 
             document.getElementById('addButton').textContent = 'Update App';
-            document.getElementById('cancelButton').style.display = 'inline-block';
+            document.getElementById('cancelButton').classList.remove('cancel-button');
             document.querySelector('#appManagement h3').scrollIntoView({ behavior: 'smooth' });
         }
 
         function cancelEdit() {
             editingIndex = -1;
             document.getElementById('addButton').textContent = 'Add App';
-            document.getElementById('cancelButton').style.display = 'none';
+            document.getElementById('cancelButton').classList.add('cancel-button');
             clearForm();
         }
 

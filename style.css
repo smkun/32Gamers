@@ -38,6 +38,7 @@ body::before {
     min-height: 100vh;
     box-sizing: border-box;
     text-align: center;
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     position: relative;
     z-index: 1;
@@ -209,6 +210,7 @@ body::before {
     align-items: center;
     padding: 20px;
     background: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -353,6 +355,7 @@ body::before {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 25px;
     padding: 5px;
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
@@ -419,6 +422,7 @@ body::before {
     cursor: pointer;
     opacity: 0.3;
     transition: all 0.3s ease;
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
@@ -478,4 +482,34 @@ body::before {
         transform: translateY(-5px) scale(0.98);
         transition: transform 0.1s ease;
     }
+}
+
+/* Firebase Admin Styles */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    padding: 8px 16px;
+}
+
+.user-flex {
+    display: flex;
+    align-items: center;
+}
+
+.user-details {
+    font-weight: 600;
+}
+
+.user-email {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.cancel-button {
+    display: none;
 }
