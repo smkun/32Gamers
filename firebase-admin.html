@@ -104,9 +104,20 @@
 
         document.getElementById('loginBtn').addEventListener('click', async () => {
             try {
-                await firebase.signInWithPopup(firebase.auth, firebase.provider);
+                showStatus('Opening sign-in popup...', 'info');
+                const result = await firebase.signInWithPopup(firebase.auth, firebase.provider);
+                showStatus('Sign-in successful!', 'success');
             } catch (error) {
-                showStatus(`Login failed: ${error.message}`, 'error');
+                console.error('Auth error:', error);
+                if (error.code === 'auth/popup-blocked') {
+                    showStatus('Popup blocked! Please allow popups for this site and try again.', 'error');
+                } else if (error.code === 'auth/popup-closed-by-user') {
+                    showStatus('Sign-in cancelled.', 'info');
+                } else if (error.code === 'auth/network-request-failed') {
+                    showStatus('Network error. Check your connection and try again.', 'error');
+                } else {
+                    showStatus(`Login failed: ${error.message}`, 'error');
+                }
             }
         });
 
@@ -144,8 +155,16 @@
                 renderApps();
                 showStatus('Apps loaded successfully!', 'success');
             } catch (error) {
-                showStatus(`Failed to load apps: ${error.message}`, 'error');
                 console.error('Load error:', error);
+                if (error.code === 'unavailable') {
+                    showStatus('Network error. Please check your connection and try again.', 'error');
+                } else if (error.code === 'permission-denied') {
+                    showStatus('Permission denied. Please sign in as admin.', 'error');
+                } else if (error.message.includes('ERR_BLOCKED_BY_CLIENT')) {
+                    showStatus('Request blocked by ad blocker. Please disable it for this site.', 'error');
+                } else {
+                    showStatus(`Failed to load apps: ${error.message}`, 'error');
+                }
             }
         }
 
