@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>32Gamers GitHub Admin</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .setup-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: #fff;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .success { background: rgba(76, 175, 80, 0.2); border: 1px solid rgba(76, 175, 80, 0.5); }
+        .error { background: rgba(244, 67, 54, 0.2); border: 1px solid rgba(244, 67, 54, 0.5); }
+        .info { background: rgba(33, 150, 243, 0.2); border: 1px solid rgba(33, 150, 243, 0.5); }
+
+        .app-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .app-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>32Gamers GitHub Admin</h1>
+
+        <div class="instructions">
+            <h3>Setup Instructions:</h3>
+            <ol>
+                <li>Create a GitHub repository for your 32Gamers portal</li>
+                <li>Upload your site files to the repository</li>
+                <li>Go to GitHub Settings → Developer settings → Personal access tokens</li>
+                <li>Create a token with 'repo' permissions</li>
+                <li>Enter your details below to manage your apps</li>
+            </ol>
+            <p><strong>Benefit:</strong> Your apps will be stored in GitHub and automatically update your live site!</p>
+        </div>
+
+        <div id="status"></div>
+
+        <div class="setup-section">
+            <h3>GitHub Configuration</h3>
+            <div class="form-group">
+                <label for="githubToken">GitHub Personal Access Token:</label>
+                <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+            </div>
+            <div class="form-group">
+                <label for="githubRepo">Repository (username/repo-name):</label>
+                <input type="text" id="githubRepo" placeholder="yourusername/32gamers">
+            </div>
+            <button class="btn-secondary" onclick="loadFromGitHub()">Connect & Load Apps</button>
+        </div>
+
+        <div id="appManagement" style="display: none;">
+            <h3>Add New App</h3>
+            <div class="form-group">
+                <label for="appId">App ID:</label>
+                <input type="text" id="appId" placeholder="my-new-app">
+            </div>
+            <div class="form-group">
+                <label for="appName">App Name:</label>
+                <input type="text" id="appName" placeholder="My New App">
+            </div>
+            <div class="form-group">
+                <label for="appUrl">App URL:</label>
+                <input type="text" id="appUrl" placeholder="MyNewApp/index.html">
+            </div>
+            <div class="form-group">
+                <label for="appImage">Image Filename:</label>
+                <input type="text" id="appImage" placeholder="my-app-icon.png">
+            </div>
+            <div class="form-group">
+                <label for="appDescription">Description:</label>
+                <textarea id="appDescription" rows="3" placeholder="Brief description"></textarea>
+            </div>
+            <button class="btn-primary" onclick="addApp()">Add App</button>
+            <button class="btn-primary" onclick="saveToGitHub()">Save All Changes</button>
+
+            <h3>Current Apps</h3>
+            <div class="app-list" id="appList"></div>
+        </div>
+    </div>
+
+    <script>
+        let apps = [];
+        let githubConfig = {
+            token: '',
+            repo: ''
+        };
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status-message ${type}">${message}</div>`;
+            setTimeout(() => statusDiv.innerHTML = '', 5000);
+        }
+
+        async function loadFromGitHub() {
+            const token = document.getElementById('githubToken').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+
+            if (!token || !repo) {
+                showStatus('Please enter both GitHub token and repository', 'error');
+                return;
+            }
+
+            githubConfig = { token, repo };
+
+            try {
+                showStatus('Connecting to GitHub...', 'info');
+
+                // Try to fetch apps.json from GitHub
+                const response = await fetch(`https://api.github.com/repos/${repo}/contents/apps.json`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const content = JSON.parse(atob(data.content));
+                    apps = content.apps || [];
+                    showStatus('Successfully loaded apps from GitHub!', 'success');
+                } else {
+                    // File doesn't exist, start with empty apps
+                    apps = [];
+                    showStatus('No apps.json found. Starting fresh!', 'info');
+                }
+
+                document.getElementById('appManagement').style.display = 'block';
+                renderApps();
+
+            } catch (error) {
+                showStatus(`Error connecting to GitHub: ${error.message}`, 'error');
+            }
+        }
+
+        function renderApps() {
+            const appList = document.getElementById('appList');
+            appList.innerHTML = '';
+
+            apps.forEach((app, index) => {
+                const appDiv = document.createElement('div');
+                appDiv.className = 'app-item';
+                appDiv.innerHTML = `
+                    <div>
+                        <strong>${app.name}</strong><br>
+                        <small>${app.description}</small>
+                    </div>
+                    <button class="btn-danger" onclick="removeApp(${index})">Remove</button>
+                `;
+                appList.appendChild(appDiv);
+            });
+        }
+
+        function addApp() {
+            const newApp = {
+                id: document.getElementById('appId').value.trim(),
+                name: document.getElementById('appName').value.trim(),
+                url: document.getElementById('appUrl').value.trim(),
+                image: document.getElementById('appImage').value.trim(),
+                description: document.getElementById('appDescription').value.trim()
+            };
+
+            if (!newApp.id || !newApp.name || !newApp.url || !newApp.image || !newApp.description) {
+                showStatus('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (apps.find(app => app.id === newApp.id)) {
+                showStatus('App ID already exists', 'error');
+                return;
+            }
+
+            apps.push(newApp);
+            renderApps();
+
+            // Clear form
+            ['appId', 'appName', 'appUrl', 'appImage', 'appDescription'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+
+            showStatus('App added! Remember to click "Save All Changes"', 'success');
+        }
+
+        function removeApp(index) {
+            if (confirm('Remove this app?')) {
+                apps.splice(index, 1);
+                renderApps();
+                showStatus('App removed! Remember to click "Save All Changes"', 'success');
+            }
+        }
+
+        async function saveToGitHub() {
+            if (!githubConfig.token || !githubConfig.repo) {
+                showStatus('Please connect to GitHub first', 'error');
+                return;
+            }
+
+            const appsData = {
+                title: "Welcome to the 32Gamers Portal!",
+                apps: apps
+            };
+
+            try {
+                showStatus('Saving to GitHub...', 'info');
+
+                // First, try to get the current file to get its SHA (required for updates)
+                let sha = null;
+                try {
+                    const currentFile = await fetch(`https://api.github.com/repos/${githubConfig.repo}/contents/apps.json`, {
+                        headers: {
+                            'Authorization': `token ${githubConfig.token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    if (currentFile.ok) {
+                        const currentData = await currentFile.json();
+                        sha = currentData.sha;
+                    }
+                } catch (e) {
+                    // File doesn't exist yet, that's okay
+                }
+
+                // Create or update the file
+                const content = btoa(JSON.stringify(appsData, null, 2));
+                const updateData = {
+                    message: `Update apps.json via admin interface`,
+                    content: content
+                };
+
+                if (sha) {
+                    updateData.sha = sha;
+                }
+
+                const response = await fetch(`https://api.github.com/repos/${githubConfig.repo}/contents/apps.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${githubConfig.token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (response.ok) {
+                    showStatus('Successfully saved to GitHub! Your site will update automatically.', 'success');
+                } else {
+                    const error = await response.json();
+                    showStatus(`GitHub API Error: ${error.message}`, 'error');
+                }
+
+            } catch (error) {
+                showStatus(`Error saving to GitHub: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

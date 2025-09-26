@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>32Gamers Admin - Add New App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .current-apps {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .app-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .app-info {
+            flex: 1;
+        }
+
+        .app-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 5px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: #fff;
+        }
+
+        .success-message, .error-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .success-message {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+
+        .error-message {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>32Gamers Portal Admin</h1>
+
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <p>Use this form to add new apps to your portal. The changes will generate a new apps.json file that you'll need to copy to your main site.</p>
+            <p><strong>Important:</strong> Make sure your image files are uploaded to the main directory before adding the app.</p>
+        </div>
+
+        <div id="messages"></div>
+
+        <form id="addAppForm">
+            <div class="form-group">
+                <label for="appId">App ID (unique identifier):</label>
+                <input type="text" id="appId" placeholder="e.g., my-new-app" required>
+            </div>
+
+            <div class="form-group">
+                <label for="appName">App Name:</label>
+                <input type="text" id="appName" placeholder="e.g., My New RPG App" required>
+            </div>
+
+            <div class="form-group">
+                <label for="appUrl">App URL (relative path):</label>
+                <input type="text" id="appUrl" placeholder="e.g., MyNewApp/index.html" required>
+            </div>
+
+            <div class="form-group">
+                <label for="appImage">Image Filename:</label>
+                <input type="text" id="appImage" placeholder="e.g., my-app-icon.png" required>
+            </div>
+
+            <div class="form-group">
+                <label for="appDescription">Description:</label>
+                <textarea id="appDescription" rows="3" placeholder="Brief description of what this app does" required></textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-primary">Add App</button>
+                <button type="button" class="btn-secondary" onclick="exportJSON()">Export JSON</button>
+            </div>
+        </form>
+
+        <div class="current-apps">
+            <h3>Current Apps</h3>
+            <div id="currentApps"></div>
+        </div>
+    </div>
+
+    <script>
+        let apps = [];
+
+        // Load existing apps from localStorage or start fresh
+        function loadApps() {
+            const saved = localStorage.getItem('32gamers-apps');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    apps = data.apps || [];
+                } catch (e) {
+                    console.error('Failed to load saved apps:', e);
+                }
+            }
+
+            // If no saved apps, load the default ones
+            if (apps.length === 0) {
+                apps = [
+                    {
+                        "id": "traveller",
+                        "name": "Traveller App",
+                        "url": "TravellerApp/index.html",
+                        "image": "TravellerApp.png",
+                        "description": "Character generator and game tools for Traveller RPG"
+                    },
+                    {
+                        "id": "mmrpg",
+                        "name": "MMRPG App",
+                        "url": "MMRPGApp/index.html",
+                        "image": "MMRPG.png",
+                        "description": "Tools and utilities for MMRPG campaigns"
+                    },
+                    {
+                        "id": "knight",
+                        "name": "KnightRPG App",
+                        "url": "KnightRPG/index.html",
+                        "image": "knight_tarot.png",
+                        "description": "Character tools for KnightRPG system"
+                    },
+                    {
+                        "id": "baa",
+                        "name": "BAA Campaign",
+                        "url": "BAA/index.html",
+                        "image": "BAA.png",
+                        "description": "Boston Avenger RPG Campaign resources"
+                    },
+                    {
+                        "id": "rogues",
+                        "name": "The Rogues Gallery",
+                        "url": "theRoguesGallery/index.html",
+                        "image": "theRoguesGallery.png",
+                        "description": "Character gallery and NPC resources"
+                    },
+                    {
+                        "id": "converter",
+                        "name": "5e to Daggerheart Converter",
+                        "url": "5eConverter/index.html",
+                        "image": "5eConvert.png",
+                        "description": "Convert D&D 5e content to Daggerheart system"
+                    }
+                ];
+            }
+
+            renderCurrentApps();
+        }
+
+        function renderCurrentApps() {
+            const container = document.getElementById('currentApps');
+            container.innerHTML = '';
+
+            apps.forEach((app, index) => {
+                const appItem = document.createElement('div');
+                appItem.className = 'app-item';
+                appItem.innerHTML = `
+                    <div class="app-info">
+                        <strong>${app.name}</strong><br>
+                        <small>${app.description}</small>
+                    </div>
+                    <div class="app-actions">
+                        <button class="btn-small btn-danger" onclick="removeApp(${index})">Remove</button>
+                    </div>
+                `;
+                container.appendChild(appItem);
+            });
+        }
+
+        function showMessage(message, type = 'success') {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = `<div class="${type}-message">${message}</div>`;
+            setTimeout(() => {
+                messagesDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        document.getElementById('addAppForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const newApp = {
+                id: document.getElementById('appId').value.trim(),
+                name: document.getElementById('appName').value.trim(),
+                url: document.getElementById('appUrl').value.trim(),
+                image: document.getElementById('appImage').value.trim(),
+                description: document.getElementById('appDescription').value.trim()
+            };
+
+            // Check for duplicate ID
+            if (apps.find(app => app.id === newApp.id)) {
+                showMessage('App ID already exists. Please choose a different ID.', 'error');
+                return;
+            }
+
+            // Add the new app
+            apps.push(newApp);
+            saveApps();
+            renderCurrentApps();
+
+            // Clear form
+            this.reset();
+            showMessage('App added successfully!');
+        });
+
+        function removeApp(index) {
+            if (confirm('Are you sure you want to remove this app?')) {
+                apps.splice(index, 1);
+                saveApps();
+                renderCurrentApps();
+                showMessage('App removed successfully!');
+            }
+        }
+
+        function saveApps() {
+            const data = {
+                title: "Welcome to the 32Gamers Portal!",
+                apps: apps
+            };
+            localStorage.setItem('32gamers-apps', JSON.stringify(data));
+        }
+
+        function exportJSON() {
+            const data = {
+                title: "Welcome to the 32Gamers Portal!",
+                apps: apps
+            };
+
+            const jsonString = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'apps.json';
+            a.click();
+
+            URL.revokeObjectURL(url);
+            showMessage('apps.json file downloaded! Upload this to your main site directory.');
+        }
+
+        // Initialize on page load
+        loadApps();
+    </script>
+</body>
+</html>

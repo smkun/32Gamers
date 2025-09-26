@@ -117,32 +117,83 @@ body::before {
     box-sizing: border-box;
 }
 
+/* Enhanced Mobile Responsiveness */
 @media (max-width: 768px) {
     .button-container {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: 20px;
-        padding: 0 10px;
+        padding: 0 15px;
     }
-    
+
     .wrapper {
-        padding: 20px 10px;
+        padding: 20px 15px;
     }
-    
+
     .logo-container {
         margin-top: 20px;
         margin-bottom: 20px;
     }
-    
+
     .container h1 {
         font-size: clamp(1.5rem, 6vw, 2.5rem);
         margin-bottom: 1.5rem;
+    }
+
+    .button {
+        padding: 25px 15px;
+        min-height: 140px;
+    }
+
+    .button img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .button span {
+        font-size: 14px;
+        line-height: 1.3;
     }
 }
 
 @media (max-width: 480px) {
     .button-container {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        grid-template-columns: 1fr;
         gap: 15px;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .button {
+        padding: 20px;
+        min-height: 120px;
+        margin: 0 auto;
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .button img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .button span {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .wrapper {
+        padding: 15px 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .button {
+        max-width: 260px;
+        padding: 18px;
+    }
+
+    .container h1 {
+        font-size: 1.4rem;
     }
 }
 
@@ -233,4 +284,131 @@ body::before {
     color: #ffd700;
     transform: scale(1.05);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Loading States */
+.loading-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: rgba(255, 255, 255, 0.8);
+    grid-column: 1 / -1;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Error States */
+.error-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 15px;
+    color: #fff;
+    grid-column: 1 / -1;
+}
+
+.error-message button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.error-message button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Search Functionality */
+.search-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    padding: 5px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 16px;
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: #fff;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 5px;
+    transition: all 0.3s ease;
+}
+
+.search-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 18px;
+    padding: 40px 20px;
+}
+
+/* Accessibility Improvements */
+.button:focus {
+    outline: 3px solid rgba(255, 255, 255, 0.6);
+    outline-offset: 2px;
+}
+
+/* Touch improvements for mobile */
+@media (hover: none) and (pointer: coarse) {
+    .button:hover {
+        transform: none;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .button:active {
+        transform: translateY(-5px) scale(0.98);
+        transition: transform 0.1s ease;
+    }
 }
