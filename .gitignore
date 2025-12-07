@@ -13,3 +13,7 @@ Thumbs.db
 # Editor files
 .vscode/
 .idea/
+
+# Legacy/Archived files
+OLD/node_modules/
+OLD/package-lock.json

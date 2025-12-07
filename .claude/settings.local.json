@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(python:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(mkdir:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": []

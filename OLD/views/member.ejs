@@ -1,0 +1,19 @@
+<%- include('partials/head', { pageTitle: `32Gamers Club - ${member.name}` }) %>
+<%- include('partials/nav') %>
+
+<main>
+  <h1><%= member.name %></h1>
+  
+  <div class="member-info">
+    <img src="<%= member.image %>" alt="<%= member.name %>" width="200">
+    
+    <ul>
+      <li><strong>Email:</strong> <%= member.email %></li>
+      <li><strong>Discord:</strong> <%= member.discord %></li>
+    </ul>
+  </div>
+  
+  <a href="/members">Back to Members</a>
+</main>
+
+<%- include('partials/footer') %>

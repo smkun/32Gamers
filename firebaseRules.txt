@@ -1,0 +1,69 @@
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+
+      // Deny everything unless opened below
+      match /{document=**} {
+        allow read, write: if false;
+      }
+
+      // Public reads; only admin can write; with proper schema validation
+      match /apps/{docId} {
+        allow read: if true;
+        allow create, update, delete: if isAdmin() && validAppsDoc();
+
+        function isAdmin() {
+          return request.auth != null
+                 && request.auth.uid == '9mbW4MTdXSMvGdlgUIJu5DOWMZW2';
+        }
+
+        function validAppsDoc() {
+          let required = ['appId', 'name', 'url', 'image', 'description'];
+          let allowed = ['appId', 'name', 'url', 'image', 'description', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy'];      
+
+          let data = request.resource.data;
+          let hasRequired = required.toSet().difference(data.keys().toSet()).size() == 0;
+          let keysValid = data.keys().hasOnly(allowed);
+
+          let typesValid = data.appId is string && data.appId.size() > 0
+                        && data.name is string && data.name.size() > 0
+                        && data.url is string && data.url.size() > 0
+                        && data.image is string && data.image.size() > 0
+                        && data.description is string && data.description.size() > 0;
+
+          // Validate URLs don't contain script injection patterns
+          let urlSafe = !data.url.matches('.*[<>"\';\\(\\)].*');
+
+          // Reasonable field length limits
+          let lengthsValid = data.appId.size() <= 50
+                          && data.name.size() <= 100
+                          && data.url.size() <= 200
+                          && data.image.size() <= 100
+                          && data.description.size() <= 500;
+
+          // Optional timestamp validation
+          let timestampsValid = (!('createdAt' in data) || data.createdAt is timestamp)
+                             && (!('updatedAt' in data) || data.updatedAt is timestamp);
+
+          // Optional user field validation
+          let userFieldsValid = (!('createdBy' in data) || data.createdBy is string)
+                             && (!('updatedBy' in data) || data.updatedBy is string);
+
+          return hasRequired && keysValid && typesValid && urlSafe && lengthsValid && timestampsValid && userFieldsValid;
+        }
+      }
+    }
+  }
+
+
+###OLD### 
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /apps/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+                      request.auth.token.email == "scottkunian@gmail.com";
+    }
+  }
+}
