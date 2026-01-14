@@ -5,7 +5,13 @@
       "Bash(git checkout:*)",
       "Bash(mkdir:*)",
       "Bash(lsof:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "mcp__serena__find_file",
+      "mcp__morphllm-fast-apply__read_file",
+      "mcp__serena__search_for_pattern",
+      "mcp__morphllm-fast-apply__write_file",
+      "Bash(node fetch-apps.js:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []
