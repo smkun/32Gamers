@@ -3,8 +3,14 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>32Gamers Portal</title>
+        <title>32GAMERS // MISSION CONTROL</title>
         <link rel="icon" type="image/png" href="assets/favicons/32gamers_favicon.png" />
+
+        <!-- Cyberpunk Typography -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
         <link rel="stylesheet" href="style.css" />
         <script type="module" src="scripts/firebase-config.js"></script>
         <script src="scripts/app.js" defer></script>
@@ -25,31 +31,57 @@
     </head>
 
     <body>
+        <!-- Cyberpunk Background Effects -->
+        <div class="cyber-grid"></div>
+        <div class="scanlines"></div>
+        <div class="vignette"></div>
+
         <div class="wrapper">
-            <!-- Top Centered Logo -->
+            <!-- Neon Header -->
             <div class="logo-container">
+                <div class="neon-border"></div>
                 <img src="assets/images/32Gamers_logo.png" alt="32Gamers Logo" class="logo" />
+
                 <!-- Admin Access Icon -->
-                <div class="admin-icon" id="adminIcon" title="Admin Access" onclick="handleAdminClick()">
+                <div class="admin-icon" id="adminIcon" title="Admin Access [CTRL+ALT+A]" onclick="handleAdminClick()">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 1l3 6 6 3-6 3-3 6-3-6-6-3 6-3z"/>
                         <circle cx="12" cy="12" r="3"/>
                     </svg>
+                    <div class="admin-glow"></div>
                 </div>
             </div>
 
             <div class="container">
-                <h1>Welcome to the 32Gamers Portal!</h1>
+                <h1 class="cyber-title">
+                    <span class="glitch" data-text="MISSION CONTROL">MISSION CONTROL</span>
+                    <div class="title-underline"></div>
+                </h1>
 
-                <!-- Apps will be loaded dynamically by JavaScript -->
+                <div class="subtitle">// SELECT YOUR MISSION</div>
+
+                <!-- Apps Grid -->
                 <div class="button-container">
                     <!-- Loading placeholder -->
                     <div class="loading-placeholder">
-                        <div class="spinner"></div>
-                        <p>Loading apps...</p>
+                        <div class="spinner-container">
+                            <div class="spinner"></div>
+                            <div class="spinner-glow"></div>
+                        </div>
+                        <p class="loading-text">
+                            <span class="loading-bracket">[</span>
+                            INITIALIZING NEURAL LINK
+                            <span class="loading-bracket">]</span>
+                        </p>
+                        <div class="loading-bar">
+                            <div class="loading-progress"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Floating particles -->
+        <div class="particles"></div>
     </body>
 </html>

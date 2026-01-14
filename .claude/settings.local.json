@@ -11,7 +11,12 @@
       "mcp__serena__search_for_pattern",
       "mcp__morphllm-fast-apply__write_file",
       "Bash(node fetch-apps.js:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "mcp__morphllm-fast-apply__edit_file",
+      "Skill(frontend-design)",
+      "Skill(frontend-design:*)"
     ],
     "deny": [],
     "ask": []
