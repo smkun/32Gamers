@@ -3,5 +3,17 @@
     "allow": [
       "Bash(pkill:*)"
     ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/skill-instructions-hook.sh"
+          }
+        ]
+      }
+    ]
   }
 }

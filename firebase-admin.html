@@ -11,9 +11,9 @@
     <div class="admin-container">
         <div class="admin-header">
             <h1>32Gamers Firebase Admin</h1>
-            <button onclick="window.location.href='index.html'" class="btn-secondary back-button">
+            <a href="index.html" class="btn-secondary back-button">
                 ← Back to Portal
-            </button>
+            </a>
         </div>
 
         <!-- Login Section -->
@@ -69,8 +69,8 @@
                     <label for="appDescription">Description:</label>
                     <textarea id="appDescription" rows="3" placeholder="Brief description"></textarea>
                 </div>
-                <button class="btn-primary" onclick="addApp()" id="addButton">Add App</button>
-                <button class="btn-secondary cancel-button" onclick="cancelEdit()" id="cancelButton">Cancel Edit</button>
+                <button class="btn-primary" id="addButton">Add App</button>
+                <button class="btn-secondary cancel-button" id="cancelButton">Cancel Edit</button>
 
                 <h3>Current Apps</h3>
                 <div class="app-list" id="appList">
@@ -83,220 +83,6 @@
         </div>
     </div>
 
-    <script type="module">
-        import './scripts/firebase-config.js';
-
-        let apps = [];
-        let editingIndex = -1;
-        let currentUser = null;
-
-        // Authentication
-        firebase.auth.onAuthStateChanged((user) => {
-            if (user) {
-                currentUser = user;
-                showUserSection(user);
-                loadApps();
-            } else {
-                currentUser = null;
-                showLoginSection();
-            }
-        });
-
-        document.getElementById('loginBtn').addEventListener('click', async () => {
-            try {
-                showStatus('Opening sign-in popup...', 'info');
-                const result = await firebase.signInWithPopup(firebase.auth, firebase.provider);
-                showStatus('Sign-in successful!', 'success');
-            } catch (error) {
-                console.error('Auth error:', error);
-                if (error.code === 'auth/popup-blocked') {
-                    showStatus('Popup blocked! Please allow popups for this site and try again.', 'error');
-                } else if (error.code === 'auth/popup-closed-by-user') {
-                    showStatus('Sign-in cancelled.', 'info');
-                } else if (error.code === 'auth/network-request-failed') {
-                    showStatus('Network error. Check your connection and try again.', 'error');
-                } else {
-                    showStatus(`Login failed: ${error.message}`, 'error');
-                }
-            }
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            try {
-                await firebase.signOut(firebase.auth);
-            } catch (error) {
-                showStatus(`Logout failed: ${error.message}`, 'error');
-            }
-        });
-
-        function showLoginSection() {
-            document.getElementById('loginSection').classList.remove('hidden');
-            document.getElementById('userSection').classList.add('hidden');
-        }
-
-        function showUserSection(user) {
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('userSection').classList.remove('hidden');
-
-            document.getElementById('userAvatar').src = user.photoURL || '';
-            document.getElementById('userName').textContent = user.displayName || 'User';
-            document.getElementById('userEmail').textContent = user.email || '';
-        }
-
-        // App Management
-        async function loadApps() {
-            try {
-                showStatus('Loading apps...', 'info');
-                const querySnapshot = await firebase.getDocs(firebase.collection(firebase.db, 'apps'));
-                apps = [];
-                querySnapshot.forEach((doc) => {
-                    apps.push({ id: doc.id, ...doc.data() });
-                });
-                renderApps();
-                showStatus('Apps loaded successfully!', 'success');
-            } catch (error) {
-                console.error('Load error:', error);
-                if (error.code === 'unavailable') {
-                    showStatus('Network error. Please check your connection and try again.', 'error');
-                } else if (error.code === 'permission-denied') {
-                    showStatus('Permission denied. Please sign in as admin.', 'error');
-                } else if (error.message.includes('ERR_BLOCKED_BY_CLIENT')) {
-                    showStatus('Request blocked by ad blocker. Please disable it for this site.', 'error');
-                } else {
-                    showStatus(`Failed to load apps: ${error.message}`, 'error');
-                }
-            }
-        }
-
-        async function addApp() {
-            if (!currentUser) {
-                showStatus('Please login first', 'error');
-                return;
-            }
-
-            const newApp = {
-                appId: document.getElementById('appId').value.trim(),
-                name: document.getElementById('appName').value.trim(),
-                url: document.getElementById('appUrl').value.trim(),
-                image: document.getElementById('appImage').value.trim(),
-                description: document.getElementById('appDescription').value.trim(),
-                createdAt: new Date(),
-                createdBy: currentUser.email
-            };
-
-            if (!newApp.appId || !newApp.name || !newApp.url || !newApp.image || !newApp.description) {
-                showStatus('Please fill in all fields', 'error');
-                return;
-            }
-
-            try {
-                if (editingIndex === -1) {
-                    // Adding new app
-                    if (apps.find(app => app.appId === newApp.appId)) {
-                        showStatus('App ID already exists', 'error');
-                        return;
-                    }
-                    await firebase.setDoc(firebase.doc(firebase.db, 'apps', newApp.appId), newApp);
-                    showStatus('App added successfully!', 'success');
-                } else {
-                    // Editing existing app
-                    const existingApp = apps[editingIndex];
-                    await firebase.setDoc(firebase.doc(firebase.db, 'apps', existingApp.appId), {
-                        ...newApp,
-                        createdAt: existingApp.createdAt,
-                        createdBy: existingApp.createdBy,
-                        updatedAt: new Date(),
-                        updatedBy: currentUser.email
-                    });
-                    showStatus('App updated successfully!', 'success');
-                    cancelEdit();
-                }
-
-                loadApps();
-                clearForm();
-            } catch (error) {
-                showStatus(`Failed to save app: ${error.message}`, 'error');
-            }
-        }
-
-        function editApp(index) {
-            const app = apps[index];
-            editingIndex = index;
-
-            document.getElementById('appId').value = app.appId;
-            document.getElementById('appName').value = app.name;
-            document.getElementById('appUrl').value = app.url;
-            document.getElementById('appImage').value = app.image;
-            document.getElementById('appDescription').value = app.description;
-
-            document.getElementById('addButton').textContent = 'Update App';
-            document.getElementById('cancelButton').classList.remove('cancel-button');
-            document.querySelector('#appManagement h3').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function cancelEdit() {
-            editingIndex = -1;
-            document.getElementById('addButton').textContent = 'Add App';
-            document.getElementById('cancelButton').classList.add('cancel-button');
-            clearForm();
-        }
-
-        function clearForm() {
-            ['appId', 'appName', 'appUrl', 'appImage', 'appDescription'].forEach(id => {
-                document.getElementById(id).value = '';
-            });
-        }
-
-        async function removeApp(index) {
-            if (!confirm('Remove this app?')) return;
-
-            try {
-                const app = apps[index];
-                await firebase.deleteDoc(firebase.doc(firebase.db, 'apps', app.appId));
-                showStatus('App removed successfully!', 'success');
-                loadApps();
-            } catch (error) {
-                showStatus(`Failed to remove app: ${error.message}`, 'error');
-            }
-        }
-
-        function renderApps() {
-            const appList = document.getElementById('appList');
-            appList.innerHTML = '';
-
-            if (apps.length === 0) {
-                appList.innerHTML = '<p style="text-align: center; opacity: 0.7;">No apps found. Add your first app above!</p>';
-                return;
-            }
-
-            apps.forEach((app, index) => {
-                const appDiv = document.createElement('div');
-                appDiv.className = 'app-item';
-                appDiv.innerHTML = `
-                    <div>
-                        <strong>${app.name}</strong><br>
-                        <small>${app.description}</small>
-                    </div>
-                    <div>
-                        <button class="btn-secondary" onclick="editApp(${index})">Edit</button>
-                        <button class="btn-danger" onclick="removeApp(${index})">Remove</button>
-                    </div>
-                `;
-                appList.appendChild(appDiv);
-            });
-        }
-
-        function showStatus(message, type = 'info') {
-            const statusDiv = document.getElementById('status');
-            statusDiv.innerHTML = `<div class="status-message ${type}">${message}</div>`;
-            setTimeout(() => statusDiv.innerHTML = '', 5000);
-        }
-
-        // Make functions global for onclick handlers
-        window.addApp = addApp;
-        window.editApp = editApp;
-        window.cancelEdit = cancelEdit;
-        window.removeApp = removeApp;
-    </script>
+    <script type="module" src="scripts/admin.js"></script>
 </body>
 </html>

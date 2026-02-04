@@ -1,0 +1,14 @@
+# 32Gamers Club Portal - Robots.txt
+# Allow all crawlers access to public content
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://32gamers.com/sitemap.xml
+
+# Block admin panel from indexing
+Disallow: /firebase-admin.html
+
+# Block development/utility files (tools/ folder not deployed)
+Disallow: /tools/

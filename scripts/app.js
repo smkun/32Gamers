@@ -11,15 +11,22 @@ class PortalManager {
         this.setupEventListeners();
     }
 
+    async waitForFirebase(maxRetries = 3) {
+        for (let i = 0; i < maxRetries; i++) {
+            if (window.firebase?.db) return true;
+            const delay = Math.pow(2, i) * 300; // 300ms, 600ms, 1200ms
+            console.log(`Waiting for Firebase... (attempt ${i + 1}/${maxRetries})`);
+            await new Promise(r => setTimeout(r, delay));
+        }
+        return false;
+    }
+
     async loadApps() {
         try {
-            // Wait for Firebase to be ready
-            if (!window.firebase || !window.firebase.db) {
-                console.log('Waiting for Firebase to initialize...');
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
+            // Wait for Firebase with exponential backoff
+            const firebaseReady = await this.waitForFirebase();
 
-            if (window.firebase && window.firebase.db) {
+            if (firebaseReady) {
                 console.log('Loading from Firebase...');
                 const querySnapshot = await window.firebase.getDocs(window.firebase.collection(window.firebase.db, 'apps'));
                 const firebaseApps = [];
@@ -79,26 +86,11 @@ class PortalManager {
         button.setAttribute('title', app.description);
 
         button.innerHTML = `
-            <img src="assets/images/${app.image}" alt="${app.name}" onerror="this.src='assets/images/placeholder.png'"/>
+            <img src="assets/images/${app.image}" alt="${app.name}" loading="lazy" onerror="this.style.opacity='0.3'"/>
             <span>${app.name}</span>
         `;
 
-        // Add click tracking
-        button.addEventListener('click', (e) => {
-            this.trackAppClick(app.id, app.name);
-        });
-
         return button;
-    }
-
-    trackAppClick(appId, appName) {
-        // Simple analytics - could be expanded
-        if (typeof gtag !== 'undefined') {
-            gtag('event', 'app_click', {
-                'app_id': appId,
-                'app_name': appName
-            });
-        }
     }
 
     showError(message) {
@@ -214,27 +206,6 @@ class PortalManager {
             container.appendChild(button);
         });
     }
-
-    // Admin functions (for future admin panel)
-    async addApp(appData) {
-        // This would be used by an admin interface
-        this.apps.push(appData);
-        this.renderApps();
-        // In a real implementation, this would save to server/localStorage
-    }
-
-    async removeApp(appId) {
-        this.apps = this.apps.filter(app => app.id !== appId);
-        this.renderApps();
-    }
-
-    async updateApp(appId, newData) {
-        const index = this.apps.findIndex(app => app.id === appId);
-        if (index !== -1) {
-            this.apps[index] = { ...this.apps[index], ...newData };
-            this.renderApps();
-        }
-    }
 }
 
 // Initialize when DOM is ready
@@ -242,11 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.portalManager = new PortalManager();
 });
 
-// Service Worker registration for offline support (optional)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(registration => console.log('SW registered'))
-            .catch(error => console.log('SW registration failed'));
-    });
-}
+// Service Worker registration disabled - sw.js not implemented
+// Uncomment when service worker is ready:
+// if ('serviceWorker' in navigator) {
+//     navigator.serviceWorker.register('/sw.js').catch(() => {});
+// }

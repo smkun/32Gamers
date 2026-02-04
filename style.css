@@ -27,10 +27,21 @@
     --font-display: 'Orbitron', monospace;
     --font-body: 'JetBrains Mono', monospace;
 
+    /* Layout */
+    --grid-size: 50px;
+    --card-min-width: 240px;
+    --card-min-width-mobile: 200px;
+
     /* Timing */
     --fast: 150ms;
     --normal: 300ms;
     --slow: 500ms;
+
+    /* Animation Durations */
+    --anim-grid: 4s;
+    --anim-scanline: 8s;
+    --anim-glow: 2s;
+    --anim-glitch: 3s;
 }
 
 /* === RESET & BASE === */
@@ -68,10 +79,10 @@ body {
     background-image:
         linear-gradient(var(--neon-cyan) 1px, transparent 1px),
         linear-gradient(90deg, var(--neon-cyan) 1px, transparent 1px);
-    background-size: 50px 50px;
+    background-size: var(--grid-size) var(--grid-size);
     opacity: 0.03;
     z-index: 0;
-    animation: gridPulse 4s ease-in-out infinite;
+    animation: gridPulse var(--anim-grid) ease-in-out infinite;
     pointer-events: none;
 }
 
@@ -96,7 +107,7 @@ body {
     );
     z-index: 100;
     pointer-events: none;
-    animation: scanlineMove 8s linear infinite;
+    animation: scanlineMove var(--anim-scanline) linear infinite;
 }
 
 @keyframes scanlineMove {
@@ -426,7 +437,7 @@ body {
 /* === APP CARDS GRID === */
 .button-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--card-min-width), 1fr));
     gap: 2rem;
     width: 100%;
     margin-top: 3rem;
@@ -1113,7 +1124,7 @@ body {
 /* === RESPONSIVE === */
 @media (max-width: 1024px) {
     .button-container {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(var(--card-min-width-mobile), 1fr));
         gap: 1.5rem;
     }
 }

@@ -4,12 +4,47 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>32GAMERS // MISSION CONTROL</title>
+        <meta name="description" content="32Gamers Club - Cyberpunk gaming community portal with curated tabletop RPG applications, character builders, and campaign tools." />
+        <meta name="theme-color" content="#0a0a0f" />
+
+        <!-- Open Graph -->
+        <meta property="og:title" content="32Gamers Club - Mission Control" />
+        <meta property="og:description" content="Cyberpunk gaming community portal with curated tabletop RPG applications" />
+        <meta property="og:image" content="assets/images/32Gamers_logo.webp" />
+        <meta property="og:type" content="website" />
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="32Gamers Club" />
+        <meta name="twitter:description" content="Cyberpunk gaming community portal" />
+
+        <!-- Canonical URL -->
+        <link rel="canonical" href="https://32gamers.com/" />
+
+        <!-- JSON-LD Structured Data -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "32Gamers Club",
+            "url": "https://32gamers.com",
+            "description": "Cyberpunk gaming community portal with curated tabletop RPG applications, character builders, and campaign tools.",
+            "applicationCategory": "GameApplication",
+            "operatingSystem": "Web Browser",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            }
+        }
+        </script>
+
         <link rel="icon" type="image/png" href="assets/favicons/32gamers_favicon.png" />
 
         <!-- Cyberpunk Typography -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
         <link rel="stylesheet" href="style.css" />
         <script type="module" src="scripts/firebase-config.js"></script>
@@ -36,29 +71,32 @@
         <div class="scanlines"></div>
         <div class="vignette"></div>
 
-        <div class="wrapper">
+        <main class="wrapper">
             <!-- Neon Header -->
-            <div class="logo-container">
+            <header class="logo-container">
                 <div class="neon-border"></div>
-                <img src="assets/images/32Gamers_logo.png" alt="32Gamers Logo" class="logo" />
+                <img src="assets/images/32Gamers_logo.webp" alt="32Gamers Logo" class="logo" />
 
                 <!-- Admin Access Icon -->
-                <div class="admin-icon" id="adminIcon" title="Admin Access [CTRL+ALT+A]" onclick="handleAdminClick()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="admin-icon" id="adminIcon"
+                        title="Admin Access [CTRL+ALT+A]"
+                        aria-label="Admin Access (Ctrl+Alt+A)"
+                        onclick="handleAdminClick()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path d="M12 1l3 6 6 3-6 3-3 6-3-6-6-3 6-3z"/>
                         <circle cx="12" cy="12" r="3"/>
                     </svg>
-                    <div class="admin-glow"></div>
-                </div>
-            </div>
+                    <div class="admin-glow" aria-hidden="true"></div>
+                </button>
+            </header>
 
-            <div class="container">
+            <section class="container">
                 <h1 class="cyber-title">
                     <span class="glitch" data-text="MISSION CONTROL">MISSION CONTROL</span>
-                    <div class="title-underline"></div>
+                    <span class="title-underline"></span>
                 </h1>
 
-                <div class="subtitle">// SELECT YOUR MISSION</div>
+                <p class="subtitle">// SELECT YOUR MISSION</p>
 
                 <!-- Apps Grid -->
                 <div class="button-container">
@@ -78,8 +116,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
 
         <!-- Floating particles -->
         <div class="particles"></div>

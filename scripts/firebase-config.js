@@ -13,7 +13,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 const app = initializeApp(firebaseConfig);
@@ -21,4 +21,4 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-window.firebase = { app, db, auth, provider, signInWithPopup, GoogleAuthProvider, signOut, collection, getDocs, doc, setDoc, deleteDoc };
+window.firebase = { app, db, auth, provider, signInWithPopup, GoogleAuthProvider, signOut, collection, getDocs, doc, setDoc, deleteDoc, serverTimestamp };
