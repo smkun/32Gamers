@@ -40,21 +40,27 @@ npx http-server -p 8000
 ```
 32gamers-club/
 ├── index.html              # Main portal page with cyberpunk UI
-├── firebase-admin.html     # Admin interface for CRUD operations
-├── style.css               # Global cyberpunk styles (1200+ lines)
+├── firebase-admin.html     # Admin interface (pure markup)
+├── style.css               # Global cyberpunk styles with CSS custom properties
+├── robots.txt              # SEO robots file
+├── sitemap.xml             # SEO sitemap
 ├── scripts/
 │   ├── firebase-config.js  # Firebase SDK initialization
-│   └── app.js              # PortalManager class - app loading/rendering
+│   ├── app.js              # PortalManager class - app loading/rendering
+│   └── admin.js            # Admin panel logic (extracted from HTML)
 ├── assets/
-│   ├── images/             # App icons and 32Gamers logo
-│   └── favicons/           # Site favicons for various apps
+│   ├── images/             # App icons (WebP format)
+│   └── favicons/           # Site favicons
+├── tools/                  # Development utilities (not deployed)
+│   ├── deploy.ps1          # Deployment script - creates dist/ folder
+│   ├── convert-to-webp.py  # Image conversion utility
+│   └── compress-images.ps1 # Image compression utility
 ├── docs/
 │   ├── FIREBASE-SETUP.md   # Firebase project configuration guide
 │   └── DEPLOYMENT-GUIDE.md # ifastnet deployment instructions
-├── firebaseRules.txt       # Firestore security rules (copy to Firebase Console)
-├── fetch-apps.js           # Node.js utility for fetching apps via Admin SDK
-├── OLD/                    # Archived Express.js backend (not used in production)
-└── claudedocs/             # Technical documentation
+├── dist/                   # Production build output (gitignored)
+├── OLD/                    # Archived files (not deployed)
+└── firebaseRules.txt       # Firestore security rules reference
 ```
 
 ## Architecture Overview
@@ -86,7 +92,7 @@ The portal follows a serverless static architecture:
 |--------|----------|---------|
 | PortalManager | `scripts/app.js` | Main controller - loads apps, renders UI, handles search |
 | Firebase Config | `scripts/firebase-config.js` | Initializes Firebase SDK, exports db/auth instances |
-| Admin Panel | `firebase-admin.html` | Inline JS module for app CRUD with auth state handling |
+| Admin Panel | `scripts/admin.js` | Admin CRUD operations, validation, auth state handling |
 
 ## Development Guidelines
 
@@ -135,13 +141,8 @@ const app = initializeApp(firebaseConfig);
 |---------|-------------|
 | `python3 -m http.server 8000` | Start local dev server (Python) |
 | `npx http-server -p 8000` | Start local dev server (Node.js) |
-| `node fetch-apps.js` | Fetch apps via Firebase Admin SDK (requires GOOGLE_APPLICATION_CREDENTIALS) |
-
-## Environment Variables
-
-| Variable | Required | Description | Example |
-|----------|----------|-------------|---------|
-| `GOOGLE_APPLICATION_CREDENTIALS` | For Admin SDK only | Path to service account key | `./serviceAccount.json` |
+| `powershell -ExecutionPolicy Bypass -File tools/deploy.ps1` | Build production dist/ folder |
+| `python tools/convert-to-webp.py` | Convert images to WebP format |
 
 **Note:** Client-side Firebase config is in `scripts/firebase-config.js`. For production, update:
 - `apiKey`, `authDomain`, `projectId`, `storageBucket`, `messagingSenderId`, `appId`
@@ -205,19 +206,24 @@ See `firebaseRules.txt` for complete rules. Key points:
 
 ### Deploy to ifastnet Ultimate
 
-**Files to upload:**
-- `index.html`
-- `firebase-admin.html`
-- `style.css`
-- `scripts/` directory
-- `assets/` directory
+**Build and deploy:**
+```powershell
+# Run from project root to create dist/ folder:
+powershell -ExecutionPolicy Bypass -File tools/deploy.ps1
 
-**Do NOT upload:**
-- `OLD/` directory
-- `node_modules/`
-- `.git/`, `.claude/`, `.serena/`
-- `claudedocs/`
-- `package.json`, `package-lock.json`
+# Upload contents of dist/ folder to ifastnet
+```
+
+**What gets deployed (in dist/):**
+- `index.html`, `firebase-admin.html`, `style.css`
+- `robots.txt`, `sitemap.xml`
+- `scripts/` (firebase-config.js, app.js, admin.js)
+- `assets/` (images, favicons)
+
+**What stays out of production:**
+- `tools/`, `docs/`, `OLD/`
+- `node_modules/`, `.git/`, `.claude/`
+- All markdown files
 
 See @docs/DEPLOYMENT-GUIDE.md for detailed instructions.
 
@@ -234,8 +240,43 @@ See @docs/DEPLOYMENT-GUIDE.md for detailed instructions.
 - @docs/FIREBASE-SETUP.md - Firebase project setup guide
 - @docs/DEPLOYMENT-GUIDE.md - ifastnet deployment instructions
 - @firebaseRules.txt - Firestore security rules
+- @TODO.md - Optimization tracking and action items
 - [Firebase Console](https://console.firebase.google.com/project/gamersadmin-f1657)
 
+## Changelog
+
+### 2026-02-04 - Comprehensive Optimization
+
+Full optimization pass tracked in @TODO.md. Key improvements:
+
+**Security**
+- Fixed XSS vulnerabilities in admin panel (textContent instead of innerHTML)
+- Added comprehensive input validation with URL/ID sanitization
+- Event delegation replaces inline onclick handlers
+
+**Performance**
+- Images converted to WebP (95.6% size reduction: 20MB → 907KB)
+- Firebase loading uses exponential backoff instead of arbitrary delay
+- Lazy loading added to app card images
+- Font weights reduced from 9 to 4 (~40% font download savings)
+
+**Accessibility & SEO**
+- Semantic HTML (main, header, section, button with aria-labels)
+- Full SEO meta tags (Open Graph, Twitter Cards, JSON-LD structured data)
+- robots.txt and sitemap.xml added
+- Canonical URL: https://32gamers.com/
+
+**Code Quality**
+- Admin panel JS extracted to `scripts/admin.js` (390 lines → 88 lines HTML)
+- CSS custom properties for maintainability
+- Dead code removed (trackAppClick, unused admin functions)
+- Deployment script created (`tools/deploy.ps1`)
+
+**Project Organization**
+- `tools/` folder for dev utilities (not deployed)
+- `dist/` build output for clean deployments
+- Consolidated docs into single `docs/` folder
+- Archived unused files to `OLD/`
 
 ## Skill Usage Guide
 
